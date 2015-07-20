@@ -1,0 +1,15 @@
+{
+  "name": "tkh-gitcrypt",
+  "version": "0.0.1",
+  "author": "st01tkh",
+  "summary": "Site certificated",
+  "license": "Apache Version 2.0",
+  "source": "https://github.com/st01tkh/puppet-gitcrypt",
+  "project_page": "https://github.com/st01tkh/puppet-gitcrypt",
+  "issues_url": "https://github.com/st01tkh/puppet-gitcrypt",
+  "description": "Site OpenSSL Certificates",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
+    {"name":"puppetlabs-git","version_requirement":">= 0.0.1"}
+  ]
+}

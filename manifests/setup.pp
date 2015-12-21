@@ -22,7 +22,7 @@ class gitcrypt::setup {
         'C:/Windows/System32/WindowsPowerShell/v1.0',
       ],
       cwd => $parent_dir,
-      command => "git clone https://github.com/shadowhand/git-encrypt.git $dir_basename",
+      command => "git clone -b legacy https://github.com/shadowhand/git-encrypt.git $dir_basename",
     }
     #$gitcrypt_path = file_join($gitcrypt_dir, 'gitcrypt')
     $gitcrypt_path = file_join_win($gitcrypt_dir, 'gitcrypt')
@@ -58,7 +58,7 @@ class gitcrypt::setup {
     exec {"git_clone_gitcrypt":
       path => [ "/bin", "/usr/bin", "/usr/local/bin" ],
       cwd => $gitcrypt_dir,
-      command => "git clone https://github.com/shadowhand/git-encrypt.git",
+      command => "git clone -b legacy https://github.com/shadowhand/git-encrypt.git",
     }
     file {"crypt_l":
       path => "/usr/local/bin/gitcrypt",

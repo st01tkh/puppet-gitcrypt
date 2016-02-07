@@ -11,18 +11,18 @@ class gitcrypt::setup {
     path => $parent_dir,
     ensure => directory,
   }
+
   if $osfamily == 'windows' {
     exec {"git_clone_gitcrypt":
       path => [
         "C:/Program Files (x86)/Git/cmd",
         "C:/Chocolatey/bin",
-        "C:ProgramData/Chocolatey/bin",
         "C:/Windows",
         "C:/Windows/System32",
         'C:/Windows/System32/WindowsPowerShell/v1.0',
       ],
       cwd => $parent_dir,
-      command => "git clone https://github.com/shadowhand/git-encrypt.git $dir_basename",
+      command => "git clone -b legacy https://github.com/shadowhand/git-encrypt.git $dir_basename",
     }
     #$gitcrypt_path = file_join($gitcrypt_dir, 'gitcrypt')
     $gitcrypt_path = file_join_win($gitcrypt_dir, 'gitcrypt')
@@ -46,9 +46,57 @@ class gitcrypt::setup {
     File['gitcrypt_parent_dir']->
     Exec['git_clone_gitcrypt']->File['gitcrypt_cmd']->File['gitcrypt_bash_cmd']
   } else {
-    exec {"git_clone_gitcrypt":
-      path => [ "/bin", "/usr/bin", "/usr/local/bin", ],
-      cwd => $gitcrypt_dir,
-      command => "git clone https://github.com/shadowhand/git-encrypt.git",
+    file {'gitcrypt_dir':
+      path => $gitcrypt_dir,
+      ensure => directory,
     }
+    exec {"rm_gitcrypt":
+      path => [ "/bin", "/usr/bin", "/usr/local/bin" ],
+      cwd => $gitcrypt_dir,
+      command => "rm -rf git-encrypt",
+    }
+    exec {"git_clone_gitcrypt":
+      path => [ "/bin", "/usr/bin", "/usr/local/bin" ],
+      cwd => $gitcrypt_dir,
+      command => "git clone -b legacy https://github.com/shadowhand/git-encrypt.git",
+    }
+    file {"crypt_l":
+      path => "/usr/local/bin/gitcrypt",
+      target => "/opt/gitcrypt/git-encrypt/gitcrypt",
+      ensure => 'link',
+    }
+    file {"merge_l":
+      path => "/usr/local/bin/gitcrypt-merge",
+      target => "/opt/gitcrypt/git-encrypt/gitcrypt-merge",
+      ensure => 'link',
+    }
+    file {"init_l":
+      path => "/usr/local/bin/git-encrypt-init.sh",
+      target => "/opt/gitcrypt/git-encrypt/git-encrypt-init.sh",
+      ensure => 'link',
+    }
+    file {"filter_l":
+      path => "/usr/local/bin/git-encrypt-filter.sh",
+      target => "/opt/gitcrypt/git-encrypt/git-encrypt-filter.sh",
+      ensure => 'link',
+    }
+    File['gitcrypt_dir']->
+    Exec['rm_gitcrypt']->
+    Exec['git_clone_gitcrypt']->
+    File['crypt_l']->
+    File['merge_l']->
+    File['init_l']->
+    File['filter_l']
+    #case $operatingsystem {
+     #'Ubuntu': {
+       #case $lsbdistcodename {
+         #'trusty', 'precise': {
+           #service {'network-manager':
+           #  enable => false,
+           #}
+         #}
+       #}
+     #}
+    #}
+  }
 }
